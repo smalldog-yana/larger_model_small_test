@@ -1,0 +1,18 @@
+from transformers import pipeline
+import gradio as gr
+
+# 1. 创建 pipeline（如果网络没问题会自动下载权重；如已离线，把 model= 换成本地路径）
+chatbot = pipeline("text-generation", model="microsoft/DialoGPT-medium")
+
+# 2. 推理函数
+def reply(text):
+    prompt = f"You are a helpful weather assistant.\nUser: {text}\nAI:"
+    out = chatbot(prompt, max_new_tokens=40)[0]["generated_text"]
+    return out.split("AI:")[-1].strip()
+
+# 3. 启动 Gradio 界面
+demo = gr.Interface(fn=reply,
+                    inputs=gr.Textbox(lines=2, placeholder="输入一句话"),
+                    outputs="text",
+                    title="Day1-LLM-Demo")
+demo.launch()
